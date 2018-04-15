@@ -1,0 +1,132 @@
+#pragma once
+#include"stack.h"
+#define N 6
+int maze[N][N]=
+{
+	{ 0, 0, 0, 0, 0, 0 },
+	{ 0, 0, 1, 1, 1, 0 },
+	{ 0, 0, 1, 0, 1, 0 },
+	{ 0, 0, 1, 1, 1, 0 },
+	{ 0, 0, 1, 0, 1, 1 },
+	{ 0, 0, 1, 0, 0, 0 },
+};
+void MazePrint();
+int MazeGetPath(Pos entry);
+void MazeGetPathR(Pos entry);
+
+Stack shortPath;
+void MazeGetShortPath(Pos entry, Stack* path);
+
+void MazePrint()
+{
+	for (size_t i = 0; i < N; ++i)
+	{
+		for (size_t j = 0; j < N; ++j)
+		{
+			printf("%d ", maze[i][j]);
+		}
+		printf("\n");
+	}
+}
+int MazeCheckIsAccess(Pos pos)
+{
+	if (pos._col >= 0 && pos._col < N
+		&&pos._row >= 0 && pos._row < N
+		&&maze[pos._row][pos._col] == 1)
+		return 1;
+	return 0;
+}
+int MazeGetPath(Pos entry)
+{
+	Stack s;
+	Pos cur = entry;
+	Pos next;
+	StackInit(&s);
+	StackPush(&s, cur);
+	while (StackEmpty(&s))
+	{
+		cur = StackTop(&s);
+		maze[cur._row][cur._col] == 2;
+		next = cur;
+
+		if (next._col == N - 1)
+		{
+			return 1;
+		}
+
+		next._row -= 1;//上
+		if (MazeCheckIsAccess(next))
+		{
+			StackPush(&s, next);
+			continue;
+		}
+
+		next = cur;
+		next._row += 1;//下
+		if (MazeCheckIsAccess(next))
+		{
+			StackPush(&s, next);
+			continue;
+		}
+
+		next = cur;
+		next._col -= 1;//左
+		if (MazeCheckIsAccess(next))
+		{
+			StackPush(&s, next);
+			continue;
+		}
+
+		next = cur;
+		next._col += 1;//左
+		if (MazeCheckIsAccess(next))
+		{
+			StackPush(&s, next);
+			continue;
+		}
+		StackPop(&s);
+	}
+	return 0;
+}
+void MazeGetPathR(Pos entry)
+{
+	Pos next = entry;
+	maze[next._row][next._col] = 2;
+	if (next._col == N - 1)
+	{
+		printf("找到出口：%d,%d\n", next._row, next._col);
+	}
+	next._row += 1;
+	if (MazeCheckIsAccess(next))
+		MazeGetPathR(next);
+
+	next = entry;
+	next._row -= 1;
+	if (MazeCheckIsAccess(next))
+		MazeGetPathR(next);
+
+	next = entry;
+	next._col -= 1;
+	if (MazeCheckIsAccess(next))
+		MazeGetPathR(next);
+
+	next = entry;
+	next._col += 1;
+	if (MazeCheckIsAccess(next))
+		MazeGetPathR(next);
+}
+
+int MazeCheckShortIsAccess(Pos next, Pos cur)
+{
+	if (next._row >= 0 && next._row < N
+		&& next._col >= 0 && next._col < N
+		&& (maze[next._row][next._col] == 1 ||
+			maze[next._row][next._col] > maze[cur._row][cur._col]))
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
